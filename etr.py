@@ -1,5 +1,7 @@
 # Lines 369–380
 # Sort — Ascending / Descending
+# OVERVIEW: Sorts the dataset by a specified column in ascending or descending order,
+# updates the global dataset state, and notifies the user via flash message.
 @app.route("/dataset/sort", methods=["POST"])
 def sort_dataset() -> Any:
     # Parse the sort order from the request: "asc" → True, anything else → False
@@ -15,6 +17,9 @@ def sort_dataset() -> Any:
 
 # Lines 387–412
 # Filter — Equality, Inequality, and Contains
+# OVERVIEW: Filters the dataset based on a specified column and operator (equality, inequality,
+# or substring match), updates the dataset state with matching rows, and displays the count
+# of filtered results.
 @app.route("/dataset/filter", methods=["POST"])
 def filter_dataset() -> Any:
     # Convert the user-supplied filter value to the appropriate data type
@@ -47,6 +52,8 @@ def filter_dataset() -> Any:
 
 # Lines 342–352
 # Convert String Column → Integer
+# OVERVIEW: Converts a specified column to an integer data type (Int64), supporting
+# nullable integers and raising an error if non-numeric values are encountered.
 def _convert_column(df, column, target):
     # Log the conversion operation to the history for future reference/undo
     _push_history(f"convert '{column}' to {target}")
@@ -68,6 +75,8 @@ def _convert_column(df, column, target):
 
 # Lines 105–113
 # Show Dtype Update in Schema Panel
+# OVERVIEW: Generates a list of column metadata (name, data type, missing value count)
+# for each column in the dataset, used to display schema information in the UI.
 def _column_summary(df):
     # Count missing (null) values for each column
     missing = df.isnull().sum()
@@ -84,6 +93,8 @@ def _column_summary(df):
 
 # Lines 201–206
 # Display Dataset Summary and Columns
+# OVERVIEW: Assembles all display-related data (summary stats, column metadata, preview rows)
+# needed to render the dataset view in the UI, including truncation status for large datasets.
 def _get_display_data(df):
     # Retrieve overall dataset statistics (row count, column count, memory usage, etc.)
     summary = _dataset_summary(df)
@@ -101,6 +112,8 @@ def _get_display_data(df):
 
 # Lines 459–468
 # Text Formatting — Strip, Uppercase, Lowercase
+# OVERVIEW: Applies text transformations (strip whitespace, uppercase, or lowercase)
+# to a specified column in the dataset.
 def _format_text(df, column, action):
     # Create a copy to avoid modifying the original DataFrame
     updated = df.copy()
@@ -123,6 +136,9 @@ def _format_text(df, column, action):
 
 # Lines 433–444
 # Group By Category Column + Count/Sum/Mean
+# OVERVIEW: Performs aggregation on the dataset by grouping rows based on a category column
+# and applying a function (sum, mean, or count) to aggregate values, updates the dataset state,
+# and displays a success notification.
 def _aggregate_data(df, group_col, agg_col, agg_func):
     # Perform aggregation based on the selected function:
     if agg_func == "sum":
@@ -152,6 +168,8 @@ def _aggregate_data(df, group_col, agg_col, agg_func):
 
 # Lines 477–486
 # Load to Database and Redirect
+# OVERVIEW: Exports the current dataset to a database table with a user-specified name,
+# overwriting if the table exists, and redirects to the database view page.
 def _load_to_database(df, table_name):
     # Ensure a dataset is loaded; raises an error if not
     df = _require_dataset()
@@ -181,6 +199,8 @@ def _load_to_database(df, table_name):
 
 # Lines 493–502
 # Click Table and Show Data from Database
+# OVERVIEW: Retrieves a preview of a selected database table (limited to DISPLAY_LIMIT rows)
+# and returns it as a Pandas DataFrame, or None if the table doesn't exist.
 def _query_database_table(selected):
     # Retrieve a list of all table names available in the connected database
     tables = inspector.get_table_names()
